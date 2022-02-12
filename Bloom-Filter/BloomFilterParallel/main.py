@@ -70,6 +70,8 @@ def initializeBitArray(array):
 
     sync_start = time.time()
 
+    bitArray = [0] * n  # Array of zeroes with n positions
+
     # Given an array of string, he applies the hash functions to it, returning the values of the hash function
     # Each parallelized loop returns an array containing the values of a hash function applied to the elements of the array
     ones0 = Parallel(n_jobs=4)(delayed(h0)(array[i]) for i in range(0, len(array)))
@@ -80,7 +82,6 @@ def initializeBitArray(array):
     ones5 = Parallel(n_jobs=4)(delayed(h5)(array[i]) for i in range(0, len(array)))
     # All arrays have the same size as the array passed as an argument to the function
 
-    bitArray = [0] * n  # Array of zeroes with n positions
     for i in range(0, len(array)):
         # Since all arrays are the same size, only one for loop can be applied
         bitArray[ones0[i]] = 1
@@ -96,37 +97,46 @@ def initializeBitArray(array):
     return bitArray
 
 
-def checkElement(string, bitArray):
+def checkElement(string, bitArray, onlyPass):
     # Apply hash functions to the string passed as an argument.
     # Checks the string's membership in the initial set using the bit array
     if bitArray[h0(string)] == 0:
+        if onlyPass != 0:
+            print(f'{string} CAN NOT pass!')
         return 0
     elif bitArray[h1(string)] == 0:
+        if onlyPass != 0:
+            print(f'{string} CAN NOT pass!')
         return 0
     elif bitArray[h2(string)] == 0:
+        if onlyPass != 0:
+            print(f'{string} CAN NOT pass!')
         return 0
     elif bitArray[h3(string)] == 0:
+        if onlyPass != 0:
+            print(f'{string} CAN NOT pass!')
         return 0
     elif bitArray[h4(string)] == 0:
+        if onlyPass != 0:
+            print(f'{string} CAN NOT pass!')
         return 0
     elif bitArray[h5(string)] == 0:
+        if onlyPass != 0:
+            print(f'{string} CAN NOT pass!')
         return 0
     else:
-        return 1
+        print(f'{string} CAN pass!')
+        return 1  # Returns 1 only if the element passes the filtering stages
 
 def checkSet(array, bitArray, onlyPass):
 
     sync_start = time.time()
     # The parallel cycle below returns an array of 0's and 1's.
     # A position is assigned a value of 1 only when the corresponding word has passed the filters
-    passed = Parallel(n_jobs=4)(delayed(checkElement)(array[i], bitArray) for i in range(0, len(array)))
+    passed = Parallel(n_jobs=4)(delayed(checkElement)(array[i], bitArray, onlyPass) for i in range(0, len(array)))
 
     passedLen = 0
     for i in range(0, len(passed)):  # This cycle is used for printing and to obtain the number of elements that have passed the filter
-        if passed[i] == 1:
-            print(f'{array[i]} CAN pass!')
-        elif onlyPass != 0:
-            print(f'{array[i]} CAN NOT pass!')
         passedLen = passedLen + passed[i]
 
     sync_end = time.time()
