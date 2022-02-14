@@ -13,4 +13,6 @@ math.h
 -
 time.h
 -
+omp.h
+-
 
