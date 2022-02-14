@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <math.h>
-#include <time.h>
 #include <omp.h>
 
 #define n 1000 //Number of points
-#define k 100 //Number of centroids
+#define k 300 //Number of centroids
 //#define DEBUG
 
 typedef struct points{
@@ -15,13 +14,13 @@ typedef struct points{
 
 }point;
 
-int KMeans(point pts[], point centroids[]);
-int MinCentroid(point Point, point centroids[]);
-double EuclideanDistance(point a, point b);
-double recomputesCentroidX(int centroid, point pts[], double def);
-double recomputesCentroidY(int centroid, point pts[], double def);
-int printClusters(int centroidID, point centroid, point pts[]);
-point initializePoint(int a, int b);
+int KMeans(point pts[], point centroids[]);  // Apply K-means algorithm
+int MinCentroid(point Point, point centroids[]);  // Search for the closest-distance centroid for a point, within a centroid group
+double EuclideanDistance(point a, point b);    // Evaluate Euclidean distance between two points
+double recomputesCentroidX(int centroid, point pts[], double def);  // Recompute the abscissa of the centroid on the basis of the cluster to which it belongs
+double recomputesCentroidY(int centroid, point pts[], double def);  //Recompute the ordinate of the centroid on the basis of the cluster to which it belongs
+int printClusters(int centroidID, point centroid, point pts[]);  // Returns a screen output to represent a cluster
+point initializePoint(int a, int b); // Creates a point, with the coordinates passed as input, and returns it
 
 int main (){
 
@@ -33,13 +32,12 @@ int main (){
     point points [n];
     point centroids [k];
 
-    clock_t PointInitialization = clock();
-
+    // Automatically creates the set of n points
     for (p = 0; p<n; p++) {
-
         points[p] = initializePoint(p, fabs(n - p));
     }
 
+    // Automatically creates the set of k centroids
     for (q = 0; q<k; q++){
         centroids[q] = initializePoint(q * k % (n + 1), (int) fabs(n - q * k) % (n + 1));
     }
@@ -54,7 +52,6 @@ int main (){
     exec_time = ftime - itime;
     printf("\n\nTime taken is %f", exec_time);
 
-
     return 0;
 
 }
@@ -65,27 +62,12 @@ int KMeans(point pts[], point centroids[]){
     printf("STARTING K-MEANS...\n");
 #endif
 
-    //cluster results[k];
-
-    //Initialization of the clusters
-    int i;
-
-    //for (i = 0; i<k; i++){
-    //results[i].indexCluster = i;
-    //results[i].centroid = centroids[i];
-    //}
-
-    int j, nearestCentroid;
+    int i, j, nearestCentroid, end = 0;
     double x, y;
-    int end = 0;
 
     while(end == 0){
 
         end = 1;
-        //Reset the number of elements in each cluster
-        //for (i = 0; i<k; i++){
-        //results[i].indexElement = 0;
-        //}
 
         //Iteration on all the points considered
 
@@ -94,20 +76,17 @@ int KMeans(point pts[], point centroids[]){
             printf("Verifing point %d...\n", i);
 #endif
             nearestCentroid = MinCentroid(pts[i], centroids);
-            //Append the point considered to "nearestCentroid" cluster
+            // Assign the point considered the "nearestCentroid" cluster
             pts[i].cluster = nearestCentroid;
-            //results[nearestCentroid].elements[results[nearestCentroid].indexElement] = i;
-            //results[nearestCentroid].indexElement += 1;
 #ifdef DEBUG
-            //printf("Point %d will go in %d cluster\n", i, nearestCentroid);
+            printf("Point %d will go in %d cluster\n", i, nearestCentroid);
 #endif
         }
 
-        //Verify if centroid don't change
 #ifdef DEBUG
         printf("\nRecomputing centroids...\n\n");
 #endif
-
+        //Verify if centroid don't change
         for(j = 0; j < k; j++){
             x = recomputesCentroidX(j, pts, centroids[j].x);
             y = recomputesCentroidY(j, pts, centroids[j].y);
@@ -127,8 +106,6 @@ int KMeans(point pts[], point centroids[]){
 
     }
 
-
-
     //Print of the clusters found
     for(i = 0; i<k; i++){
         printClusters(i, centroids[i], pts);
@@ -141,7 +118,7 @@ int KMeans(point pts[], point centroids[]){
 int MinCentroid(point Point, point centroids[]){
     int j, nearestCentroid = 0;
     double distance, min = EuclideanDistance(Point, centroids[0]);
-    //Iteration on the first centroid done (Needed to assign a value to the min variable)
+    // Iteration on the first centroid done (Needed to assign a value to the min variable)
     for(j = 1; j<k; j++) {
         //Iteration on the others centroids
         distance = EuclideanDistance(Point, centroids[j]);
@@ -152,20 +129,16 @@ int MinCentroid(point Point, point centroids[]){
 
     }
 
-    //printf("minValue: %f\n", min);
-
     return nearestCentroid;
 }
 
 double EuclideanDistance(point  a, point b){
     //Compute Euclidean between two points
-
     return sqrt(pow((a.x - b.x),2) + pow((a.y - b.y), 2));
-
 }
 
 double recomputesCentroidX(int centroid, point pts[], double def){
-    //Recomputation of x parameter for centroids
+    //Recomputation of x parameter for a centroid
 
     int i, count = 0;
     double x = 0;
@@ -174,17 +147,18 @@ double recomputesCentroidX(int centroid, point pts[], double def){
             x = x + pts[i].x;
             count++;
         }
-
     }
+
     if (count == 0){
         return def;
     }
+
     return x/count;
 
 }
 
 double recomputesCentroidY(int centroid, point pts [], double def){
-    //Recomputation of y parameter for centroids
+    //Recomputation of y parameter for a centroid
 
     int i, count;
     double y = 0;
@@ -193,8 +167,8 @@ double recomputesCentroidY(int centroid, point pts [], double def){
             y = y + pts[i].y;
             count++;
         }
-
     }
+
     if (count == 0){
         return def;
     }
@@ -224,6 +198,7 @@ int printClusters(int centroidID, point centroid, point pts[]){
 }
 
 point initializePoint(int a, int b){
+    // Creates a point with the parameters and returns it
     point p = {a, b, -1};
     return p;
 }
