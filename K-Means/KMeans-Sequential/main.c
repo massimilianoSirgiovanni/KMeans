@@ -20,7 +20,7 @@ double EuclideanDistance(point a, point b);    // Evaluate Euclidean distance be
 double recomputesCentroidX(int centroid, point pts[], double def);  // Recompute the abscissa of the centroid on the basis of the cluster to which it belongs
 double recomputesCentroidY(int centroid, point pts[], double def);  //Recompute the ordinate of the centroid on the basis of the cluster to which it belongs
 int printClusters(int centroidID, point centroid, point pts[]);  // Returns a screen output to represent a cluster
-point initializePoint(int a, int b); // Creates a point, with the coordinates passed as input, and returns it
+point initializePoint(double a, double b); // Creates a point, with the coordinates passed as input, and returns it
 
 int main (){
 
@@ -197,7 +197,7 @@ int printClusters(int centroidID, point centroid, point pts[]){
 
 }
 
-point initializePoint(int a, int b){
+point initializePoint(double a, double b){
     // Creates a point with the parameters and returns it
     point p = {a, b, -1};
     return p;
