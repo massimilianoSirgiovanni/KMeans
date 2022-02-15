@@ -2,8 +2,8 @@
 #include <math.h>
 #include <omp.h>
 
-#define n 1000 //Number of points
-#define k 300 //Number of centroids
+#define n 100 //Number of points
+#define k 10 //Number of centroids
 //#define DEBUG
 
 typedef struct points{

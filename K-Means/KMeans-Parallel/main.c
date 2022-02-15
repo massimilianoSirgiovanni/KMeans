@@ -2,8 +2,8 @@
 #include <math.h>
 #include <omp.h>
 
-#define n 1000 //Number of points
-#define k 300 //Number of centroids
+#define n 100 //Number of points
+#define k 10 //Number of centroids
 //#define DEBUG
 
 typedef struct points{
@@ -34,7 +34,7 @@ int main (){
 
 #pragma omp parallel
     {
-#pragma omp for schedule(dynamic) nowait
+#pragma omp for schedule(auto) nowait
         // Automatically creates the set of n points
         for (p = 0; p < n; p++) {
 
@@ -42,13 +42,13 @@ int main (){
         }
         // A barrier is not needed since the data in the two for loops are disconnected
 
-#pragma omp for schedule(dynamic)
+#pragma omp for schedule(auto)
         // Automatically creates the set of k centroids
         for (q = 0; q < k; q++) {
             centroids[q] = initializePoint(q * k % (n + 1), (int) fabs(n - q * k) % (n + 1));
         }
 
-    }
+    };
 
     ///////////////////////////////////////////////////
 
@@ -81,7 +81,7 @@ int KMeans(point pts[], point centroids[]){
 #pragma omp parallel
         {
             //Iteration on all the points considered
-#pragma omp for schedule(dynamic) private(nearestCentroid)
+#pragma omp for schedule(auto) private(nearestCentroid)
             for (i = 0; i < n; i++) {
 #ifdef DEBUG
                 printf("Verifing point %d...\n", i);
@@ -101,7 +101,7 @@ int KMeans(point pts[], point centroids[]){
             printf("\nRecomputing centroids...\n\n");
 #endif
             //Verify if centroid don't change
-#pragma omp for schedule(dynamic) private(x, y)
+#pragma omp for schedule(auto) private(x, y)
             for (j = 0; j < k; j++) {
                 x = recomputesCentroidX(j, pts, centroids[j].x);
                 y = recomputesCentroidY(j, pts, centroids[j].y);
@@ -116,7 +116,7 @@ int KMeans(point pts[], point centroids[]){
 
             }
 
-        }
+        };  //end omp parallel
 #ifdef DEBUG
         printf("\n Iteration ending... \n\n");
 #endif
@@ -205,6 +205,7 @@ int printClusters(int centroidID, point centroid, point pts[]){
     printf("    Centroid: (%f, %f)\n", centroid.x, centroid.y);
     printf("    Points in cluster: ");
     int i;
+#pragma omp parallel for schedule(auto)
     for(i = 0; i < n; i++){
         if(pts[i].cluster == centroidID) {
             printf("(%f, %f) ", pts[i].x, pts[i].y);

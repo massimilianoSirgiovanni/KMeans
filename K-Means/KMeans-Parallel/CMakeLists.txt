@@ -3,7 +3,7 @@ project(Kmeans C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(Kmeans main.c)
+add_executable(Kmeans-Parallel main.c)
 
 # openMP configuration
 FIND_PACKAGE(OpenMP REQUIRED)
