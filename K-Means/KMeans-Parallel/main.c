@@ -2,8 +2,9 @@
 #include <math.h>
 #include <omp.h>
 
-#define n 100 //Number of points
-#define k 10 //Number of centroids
+#define n 5000 //Number of points
+#define k 300 //Number of centroids
+#define T 4  //Number of threads
 //#define DEBUG
 
 typedef struct points{
@@ -32,6 +33,7 @@ int main (){
     point points [n];
     point centroids [k];
 
+    omp_set_num_threads(T);
 #pragma omp parallel
     {
 #pragma omp for schedule(auto) nowait
@@ -77,7 +79,7 @@ int KMeans(point pts[], point centroids[]){
 
         end = 1;
 
-
+        omp_set_num_threads(T);
 #pragma omp parallel
         {
             //Iteration on all the points considered
@@ -205,6 +207,7 @@ int printClusters(int centroidID, point centroid, point pts[]){
     printf("    Centroid: (%f, %f)\n", centroid.x, centroid.y);
     printf("    Points in cluster: ");
     int i;
+    omp_set_num_threads(T);
 #pragma omp parallel for schedule(auto)
     for(i = 0; i < n; i++){
         if(pts[i].cluster == centroidID) {

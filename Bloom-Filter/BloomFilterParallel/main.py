@@ -4,6 +4,8 @@ import numpy as np
 
 n = 20000   # Length of the bit array
 
+T = 4 # Number of processes
+
 
 def sumAscii(string):
     # transforms the characters of a string into their ascii code
@@ -22,7 +24,7 @@ def h0(string):
 def h1(string):
     # They convert the characters to ascii code and put them in an array
     # This can be done in parallel, returning an array containing all ascii codes
-    result = Parallel(n_jobs=4)(delayed(ord)(string[i]) for i in range(0, len(string)))
+    result = Parallel(n_jobs=T)(delayed(ord)(string[i]) for i in range(0, len(string)))
     matrix = np.vander(result, n)  # A Vandermonde matrix is created with input the ascii array and the bit array length
     sumElements = 0
     for j in range(0, len(matrix)):   # All elements of the matrix are added together
@@ -74,12 +76,12 @@ def initializeBitArray(array):
 
     # Given an array of string, he applies the hash functions to it, returning the values of the hash function
     # Each parallelized loop returns an array containing the values of a hash function applied to the elements of the array
-    ones0 = Parallel(n_jobs=4)(delayed(h0)(array[i]) for i in range(0, len(array)))
-    ones1 = Parallel(n_jobs=4)(delayed(h1)(array[i]) for i in range(0, len(array)))
-    ones2 = Parallel(n_jobs=4)(delayed(h2)(array[i]) for i in range(0, len(array)))
-    ones3 = Parallel(n_jobs=4)(delayed(h3)(array[i]) for i in range(0, len(array)))
-    ones4 = Parallel(n_jobs=4)(delayed(h4)(array[i]) for i in range(0, len(array)))
-    ones5 = Parallel(n_jobs=4)(delayed(h5)(array[i]) for i in range(0, len(array)))
+    ones0 = Parallel(n_jobs=T)(delayed(h0)(array[i]) for i in range(0, len(array)))
+    ones1 = Parallel(n_jobs=T)(delayed(h1)(array[i]) for i in range(0, len(array)))
+    ones2 = Parallel(n_jobs=T)(delayed(h2)(array[i]) for i in range(0, len(array)))
+    ones3 = Parallel(n_jobs=T)(delayed(h3)(array[i]) for i in range(0, len(array)))
+    ones4 = Parallel(n_jobs=T)(delayed(h4)(array[i]) for i in range(0, len(array)))
+    ones5 = Parallel(n_jobs=T)(delayed(h5)(array[i]) for i in range(0, len(array)))
     # All arrays have the same size as the array passed as an argument to the function
 
     for i in range(0, len(array)):
@@ -133,7 +135,7 @@ def checkSet(array, bitArray, onlyPass):
     sync_start = time.time()
     # The parallel cycle below returns an array of 0's and 1's.
     # A position is assigned a value of 1 only when the corresponding word has passed the filters
-    passed = Parallel(n_jobs=4)(delayed(checkElement)(array[i], bitArray, onlyPass) for i in range(0, len(array)))
+    passed = Parallel(n_jobs=T)(delayed(checkElement)(array[i], bitArray, onlyPass) for i in range(0, len(array)))
 
     passedLen = 0
     for i in range(0, len(passed)):  # This cycle is used for printing and to obtain the number of elements that have passed the filter
@@ -193,7 +195,7 @@ if __name__ == '__main__':
 
     bitArray = initializeBitArray(initialSet)
 
-    for i in range(0, 10):  # The filter is applied 10 times to more easily evaluate performance
+    for i in range(0, 1):  # The filter is applied 10 times to more easily evaluate performance
 
         print(f'\n//////////////////// Execution number {i+1}//////////////////////////////////////\n')
         print(f'\nOnly {checkSet(newSet, bitArray, 0)} elements CAN PASS of which 6 elements were present in the set used for initialization \n')
