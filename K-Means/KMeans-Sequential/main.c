@@ -160,7 +160,7 @@ double recomputesCentroidX(int centroid, point pts[], double def){
 double recomputesCentroidY(int centroid, point pts [], double def){
     //Recomputation of y parameter for a centroid
 
-    int i, count;
+    int i, count = 0;
     double y = 0;
     for(i = 0; i<n; i++) {
         if (pts[i].cluster == centroid) {
